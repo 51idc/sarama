@@ -120,8 +120,9 @@ func (sp *syncProducer) SendMessages(msgs []*ProducerMessage) error {
 func (sp *syncProducer) handleSuccesses() {
 	defer sp.wg.Done()
 	for msg := range sp.producer.Successes() {
-		expectation := msg.Metadata.(chan *ProducerError)
-		expectation <- nil
+		if ch, ok := msg.Metadata.(chan *ProducerError); ok {
+			ch <- nil
+		}
 	}
 }
 
